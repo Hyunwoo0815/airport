@@ -1,32 +1,24 @@
 from flask import Flask, render_template, request
+from dotenv import load_dotenv
+import os
 import requests
 import xml.etree.ElementTree as ET
 
-app = Flask(__name__)
+# .env 파일 로드
+load_dotenv()
 
-# 공항 코드와 이름 매핑
-AIRPORTS = {
-    "CJJ": "청주",
-    "TAE": "대구",
-    "PUS": "김해",
-    "GMP": "김포",
-    "KUV": "군산",
-    "KWJ": "광주",
-    "CJU": "제주",
-    "MWX": "무안",
-    "HIN": "사천",
-    "WJU": "원주",
-    "YNY": "양양",
-    "RSU": "여수"
-}
+# 환경 변수에서 서비스 키 가져오기
+SERVICE_KEY = os.getenv("SERVICE_KEY")
+
+app = Flask(__name__)
 
 # API 요청 함수
 def get_bus_data(airport_code):
     url = "http://openapi.airport.co.kr/service/rest/AirportBusInfo/businfo"
     params = {
-        "ServiceKey": "WKp1VvR7awnciw/bWZyS/ucpv8Tiihgn8LgHK7a7Hw0u+ewXMZNo7buPDOywQc2k7pjJssVL39S0Oe6RWzCa3w==",
+        "ServiceKey": SERVICE_KEY,
         "pageNo": 1,
-        "numOfRows": 100,
+        "numOfRows": 10,
         "schAirport": airport_code
     }
 
@@ -52,14 +44,41 @@ def get_bus_data(airport_code):
 # 메인 페이지 라우트
 @app.route("/")
 def index():
-    return render_template("index.html", airports=AIRPORTS)
+    airports = {
+        "CJJ": "청주",
+        "TAE": "대구",
+        "PUS": "김해",
+        "GMP": "김포",
+        "KUV": "군산",
+        "KWJ": "광주",
+        "CJU": "제주",
+        "MWX": "무안",
+        "HIN": "사천",
+        "WJU": "원주",
+        "YNY": "양양",
+        "RSU": "여수"
+    }
+    return render_template("index.html", airports=airports)
 
 # 공항별 시간표 라우트
 @app.route("/schedule/<airport_code>")
 def schedule(airport_code):
-    airport_name = AIRPORTS.get(airport_code, "알 수 없음")
-    bus_data = get_bus_data(airport_code)  # API 호출 및 데이터 가져오기
-    return render_template("schedule.html", airport_code=airport_code, airport_name=airport_name, bus_data=bus_data)
+    bus_data = get_bus_data(airport_code)
+    airport_name = {
+        "CJJ": "청주",
+        "TAE": "대구",
+        "PUS": "김해",
+        "GMP": "김포",
+        "KUV": "군산",
+        "KWJ": "광주",
+        "CJU": "제주",
+        "MWX": "무안",
+        "HIN": "사천",
+        "WJU": "원주",
+        "YNY": "양양",
+        "RSU": "여수"
+    }.get(airport_code, "알 수 없는 공항")
+    return render_template("schedule.html", airport_name=airport_name, bus_data=bus_data)
 
 if __name__ == "__main__":
     app.run(debug=True)
