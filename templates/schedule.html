@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ airport_name }} 버스 시간표</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #005b99;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        th {
+            background-color: #e0f7fa;
+            color: #005b99;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        td {
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            text-align: left;
+            position: relative;
+        }
+
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3; /* 3줄로 제한 */
+            -webkit-box-orient: vertical;
+            max-height: 60px;
+        }
+
+        .show-more {
+            color: #0066cc;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .show-more:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #005b99;
+            color: #fff;
+            text-decoration: none;
+            font-size: 1em;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-link:hover {
+            background-color: #004080;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ airport_name }} 공항 버스 시간표</h1>
+
+    {% if bus_data %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>버스 종류</th>
+                    <th>버스 번호</th>
+                    <th>첫차 시간</th>
+                    <th>막차 시간</th>
+                    <th>요금</th>
+                    <th>운행 경로</th>
+                    <th>운행 시간표</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bus in bus_data %}
+                <tr>
+                    <td>{{ bus.bus_category }}</td>
+                    <td>{{ bus.bus_number }}</td>
+                    <td>{{ bus.first_time }}</td>
+                    <td>{{ bus.end_time }}</td>
+                    <td>{{ bus.fare }}원</td>
+                    <td>
+                        <div class="truncate" id="route-{{ loop.index }}">{{ bus.route }}</div>
+                        <span class="show-more" onclick="toggleContent('route-{{ loop.index }}', this)">더보기</span>
+                    </td>
+                    <td>
+                        <div class="truncate" id="stops-{{ loop.index }}">{{ bus.stops }}</div>
+                        <span class="show-more" onclick="toggleContent('stops-{{ loop.index }}', this)">더보기</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="text-align: center; margin-top: 20px;">해당 공항의 버스 정보가 없습니다.</p>
+    {% endif %}
+
+    <div style="text-align: center;">
+        <a href="/" class="back-link">메인으로 돌아가기</a>
+    </div>
+
+    <script>
+        function toggleContent(id, element) {
+            const content = document.getElementById(id);
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                content.style.overflow = "hidden";
+                content.classList.add("truncate");
+                element.textContent = "더보기";
+            } else {
+                content.style.maxHeight = "none";
+                content.style.overflow = "visible";
+                content.classList.remove("truncate");
+                element.textContent = "접기";
+            }
+        }
+    </script>
+</body>
+</html>
